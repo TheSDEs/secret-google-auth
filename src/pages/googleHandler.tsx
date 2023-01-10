@@ -1,13 +1,33 @@
 import { PageProps } from "gatsby";
 import * as React from "react";
+import {
+  getGoogleOauthToken,
+  GoogleOauthToken,
+} from "../utils/getGoogleOauthToken";
 
 const GoogleHandler: React.FC<PageProps> = ({ location }) => {
   const params = new URLSearchParams(location.search);
-  const parameter1 = params.get("code");
-  const parameter2 = params.get("state");
+  const code = params.get("code");
+  const state = params.get("state");
 
-  console.log(parameter1); // -> "firstParam"
-  console.log(parameter2); // -> "secondParam"
+  if (!code) {
+    return <>No code!</>;
+  }
+
+  console.log(code);
+  console.log(state);
+
+  const [oauthToken, setOauthToken] = React.useState<GoogleOauthToken>({
+    access_token: "",
+    id_token: "",
+    expires_in: 0,
+    refresh_token: "",
+    token_type: "",
+    scope: "",
+  });
+  React.useEffect(() => {
+    getGoogleOauthToken({ code }).then((token) => setOauthToken(token));
+  }, []);
 
   return (
     <main>
