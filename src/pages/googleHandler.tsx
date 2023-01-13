@@ -2,7 +2,9 @@ import { PageProps } from "gatsby";
 import * as React from "react";
 import {
   getGoogleOauthToken,
+  getGoogleUser,
   GoogleOauthToken,
+  GoogleUserResult,
 } from "../utils/getGoogleOauthToken";
 
 const GoogleHandler: React.FC<PageProps> = ({ location }) => {
@@ -25,13 +27,36 @@ const GoogleHandler: React.FC<PageProps> = ({ location }) => {
     token_type: "",
     scope: "",
   });
+
+  const [googleUser, setGoogleUser] = React.useState<GoogleUserResult>({
+    id: "",
+    email: "",
+    verified_email: false,
+    name: "",
+    given_name: "",
+    family_name: "",
+    picture: "",
+    locale: "",
+  });
+
   React.useEffect(() => {
-    getGoogleOauthToken({ code }).then((token) => setOauthToken(token));
+    getGoogleOauthToken({ code }).then((token) => {
+      setOauthToken(token);
+      getGoogleUser({
+        id_token: token.id_token,
+        access_token: token.access_token,
+      }).then((result) => {
+        setGoogleUser(result);
+      });
+    });
   }, []);
 
   return (
     <main>
-      <h1>tom</h1>
+      <h1>Google OAuth token:</h1>
+      <div>{JSON.stringify(oauthToken)}</div>
+      <h1>Google user:</h1>
+      <div>{JSON.stringify(googleUser)}</div>
     </main>
   );
 };
